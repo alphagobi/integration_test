@@ -4,7 +4,7 @@
 set -e
 
 # Navigate to the project directory
-cd /root/integration_check
+cd /root/integration_check/Integration_test
 
 # Pull the latest changes from the repository
 echo "Pulling the latest changes from the repository..."
