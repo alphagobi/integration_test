@@ -18,14 +18,18 @@ jobs:
         with:
           ssh-private-key: ${{ secrets.DROPLET1_SSH_PRIVATE_KEY }}  # Use the private key stored in GitHub Secrets
 
+      - name: Debug SSH agent
+        run: echo "SSH_AUTH_SOCK: ${{ steps.ssh-agent.outputs.ssh-auth-sock }}"
+      
+      - name: List SSH Auth Sock
+        run: ls $SSH_AUTH_SOCK
+      
       - name: Verify SSH connection to droplet
-        run: |
-          ssh -o StrictHostKeyChecking=no -v root@68.183.91.126 "echo 'SSH connection successful!'"
+        run: ssh -vvv -o StrictHostKeyChecking=no root@68.183.91.126 "echo 'SSH connection successful!'"
         env:
           SSH_AUTH_SOCK: ${{ steps.ssh-agent.outputs.ssh-auth-sock }}  # Ensure SSH agent is used for authentication
 
       - name: Run deploy script on droplet
-        run: |
-          ssh -o StrictHostKeyChecking=no -v root@68.183.91.126 'bash /root/integration_check/Integration_test/deploy.sh'
+        run: ssh -o StrictHostKeyChecking=no -v root@68.183.91.126 'bash /root/integration_check/Integration_test/deploy.sh'
         env:
           SSH_AUTH_SOCK: ${{ steps.ssh-agent.outputs.ssh-auth-sock }}  # Ensure SSH agent is used for authentication
