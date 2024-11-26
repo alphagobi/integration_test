@@ -1,35 +1,27 @@
-name: Continuous Deployment
+name: Deploy on Push
 
 on:
-  push:
+  push:  # Trigger the workflow on any push to the repository
     branches:
-      - main  # Triggers deployment only on changes to the main branch
+      - main  # Replace with the branch you want to monitor (e.g., 'main')
 
 jobs:
   deploy:
-    runs-on: ubuntu-latest  # Runs on a GitHub-hosted Ubuntu runner
-    
+    name: Deploy to Remote Server
+    runs-on: ubuntu-latest
+
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2  # Checkout the code from the repository
+      # Checkout the repository to get the latest code (optional)
+      - name: Checkout Code
+        uses: actions/checkout@v3
 
-      - name: Set up SSH key
-        uses: webfactory/ssh-agent@v0.5.3  # Use the SSH key stored in GitHub Secrets
+      # Set up SSH and execute the script on the remote server
+      - name: Execute Deploy Script on Remote Server
+        uses: appleboy/ssh-action@v0.1.7
         with:
-          ssh-private-key: ${{ secrets.DROPLET1_SSH_PRIVATE_KEY }}  # Use the private key stored in GitHub Secrets
-
-      - name: Debug SSH agent
-        run: echo "SSH_AUTH_SOCK: ${{ steps.ssh-agent.outputs.ssh-auth-sock }}"
-      
-      - name: List SSH Auth Sock
-        run: ls $SSH_AUTH_SOCK
-      
-      - name: Verify SSH connection to droplet
-        run: ssh -vvv -o StrictHostKeyChecking=no root@68.183.91.126 "echo 'SSH connection successful!'"
-        env:
-          SSH_AUTH_SOCK: ${{ steps.ssh-agent.outputs.ssh-auth-sock }}  # Ensure SSH agent is used for authentication
-
-      - name: Run deploy script on droplet
-        run: ssh -o StrictHostKeyChecking=no -v root@68.183.91.126 'bash /root/integration_check/Integration_test/deploy.sh'
-        env:
-          SSH_AUTH_SOCK: ${{ steps.ssh-agent.outputs.ssh-auth-sock }}  # Ensure SSH agent is used for authentication
+          host: 68.183.91.126            # Remote server IP
+          username: root                 # SSH username
+          key: ${{ secrets.DROPLET1_SSH_PRIVATE_KEY }} # SSH private key from secrets
+          script: |
+            cd /root/integration_check/Integration_test
+            ./deploy.sh
