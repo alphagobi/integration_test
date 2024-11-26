@@ -1,25 +1,21 @@
-name: List Directories on Droplet
+name: Continuous Deployment
 
 on:
   push:
     branches:
-      - main  # Triggers on push to the main branch
+      - main
 
 jobs:
-  list_directories:
-    runs-on: ubuntu-latest  # Use GitHub-hosted Ubuntu runner
-
+  deploy:
+    runs-on: ubuntu-latest
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v2  # Checkout the code from the repository
+      - name: Checkout code
+        uses: actions/checkout@v2
 
-    - name: Set up SSH key
-      uses: webfactory/ssh-agent@v0.5.3  # Load the SSH key into the SSH agent
-      with:
-        ssh-private-key: ${{ secrets.DROPLET1_SSH_PRIVATE_KEY }}  # Use the private key stored in GitHub Secrets
+      - name: Set up SSH key
+        uses: webfactory/ssh-agent@v0.5.3
+        with:
+          ssh-private-key: ${{ secrets.DROPLET1_SSH_PRIVATE_KEY }}
 
-    - name: List all directories on droplet
-      run: |
-        ssh -o StrictHostKeyChecking=no -T root@68.183.91.126 "find / -type d"
-      env:
-        SSH_AUTH_SOCK: ${{ steps.ssh-agent.outputs.ssh-auth-sock }}  # Ensure SSH agent is used for authentication
+      - name: Test SSH connection
+        run: ssh -o StrictHostKeyChecking=no root@68.183.91.126 "echo 'Connection successful!'"
