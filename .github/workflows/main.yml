@@ -3,19 +3,23 @@ name: Continuous Deployment
 on:
   push:
     branches:
-      - main
+      - main  # Triggers deployment only on changes to the main branch
 
 jobs:
   deploy:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest  # Runs on a GitHub-hosted Ubuntu runner
+    
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
+    - name: Checkout code
+      uses: actions/checkout@v2  # Checkout the code from the repository
 
-      - name: Set up SSH key
-        uses: webfactory/ssh-agent@v0.5.3
-        with:
-          ssh-private-key: ${{ secrets.DROPLET1_SSH_PRIVATE_KEY }}
+    - name: Set up SSH key
+      uses: webfactory/ssh-agent@v0.5.3  # Use the SSH key stored in GitHub Secrets
+      with:
+        ssh-private-key: ${{ secrets.DROPLET1_SSH_PRIVATE_KEY }}  # Use the private key stored in GitHub Secrets
 
-      - name: Test SSH connection
-        run: ssh -o StrictHostKeyChecking=no root@68.183.91.126 "echo 'Connection successful!'"
+    - name: Run deploy script on droplet
+      run: |
+        ssh -o StrictHostKeyChecking=no root@68.183.91.126 'bash /root/integration_check/Integration_test/deploy.sh'
+      env:
+        SSH_AUTH_SOCK: ${{ steps.ssh-agent.outputs.ssh-auth-sock }}  # Ensure SSH agent is used for authentication
