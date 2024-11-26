@@ -20,6 +20,6 @@ jobs:
 
     - name: Run deploy script on droplet
       run: |
-        ssh -o StrictHostKeyChecking=no root@<68.183.91.126> 'bash /root/integration_check/deploy.sh'
+        ssh -o StrictHostKeyChecking=no root@<68.183.91.126> 'bash /root/integration_check/Integration_test/deploy.sh'
       env:
         SSH_AUTH_SOCK: ${{ steps.ssh-agent.outputs.ssh-auth-sock }}
